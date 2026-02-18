@@ -25,9 +25,16 @@ The project includes a minimal Docker image built from scratch:
 docker run ghcr.io/nanonyme/tcp-eof:latest 9999
 ```
 
+## Use Cases
+
+- **TCP Health Checks for Any Service**: tcp-eof can be used as a health check container for any service, including UDP-based services that need a TCP health check endpoint for load balancer compatibility.
+- **Simple TCP Protocol Testing**: Provides a minimal TCP endpoint for testing network connectivity and load balancer configurations.
+
 ## AWS ECS Example with ngIRCd
 
 This example demonstrates using tcp-eof as a health check sidecar for an ngIRCd IRC server running on AWS ECS, with a Network Load Balancer providing both direct IRC and TLS-terminated IRC access.
+
+**Why IRC?** IRC is used here as an example of a simple, non-HTTP TCP protocol. This demonstrates why a Network Load Balancer (NLB) is necessary instead of an Application Load Balancer (ALB), which only supports HTTP/HTTPS protocols. The tcp-eof sidecar provides a reliable TCP health check endpoint without requiring implementation of the IRC protocol for health checking.
 
 ### Architecture
 
