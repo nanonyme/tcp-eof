@@ -114,7 +114,7 @@ Resources:
         # ngIRCd IRC server
         - Name: ngircd
           Image: linuxserver/ngircd:latest
-          Essential: false
+          Essential: true
           DependsOn:
             - ContainerName: tcp-eof
               Condition: START
@@ -257,7 +257,7 @@ Outputs:
 
 ### Key Features of the Example
 
-1. **Essential Sidecar Pattern**: The tcp-eof container is marked as `Essential: true`, while ngIRCd is `Essential: false` and depends on tcp-eof starting. This ensures health checks are always available.
+1. **Essential Sidecar Pattern**: Both the tcp-eof and ngIRCd containers are marked as `Essential: true`, ensuring that if either container terminates, ECS will spawn a new task. ngIRCd depends on tcp-eof starting to ensure health checks are available before the IRC server starts.
 
 2. **TLS Termination**: The NLB listener on port 6697 terminates TLS and forwards plain IRC traffic to ngIRCd on port 6667, allowing ngIRCd to serve both encrypted and unencrypted connections without needing TLS configuration.
 
