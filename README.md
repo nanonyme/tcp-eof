@@ -95,29 +95,10 @@ Resources:
       Memory: '512'
       ExecutionRoleArn: !GetAtt TaskExecutionRole.Arn
       ContainerDefinitions:
-        # tcp-eof sidecar for health checks
-        - Name: tcp-eof
-          Image: ghcr.io/nanonyme/tcp-eof:latest
-          Essential: true
-          Command:
-            - '9999'
-          PortMappings:
-            - ContainerPort: 9999
-              Protocol: tcp
-          LogConfiguration:
-            LogDriver: awslogs
-            Options:
-              awslogs-group: !Ref LogGroup
-              awslogs-region: !Ref AWS::Region
-              awslogs-stream-prefix: tcp-eof
-        
         # ngIRCd IRC server
         - Name: ngircd
           Image: linuxserver/ngircd:latest
           Essential: true
-          DependsOn:
-            - ContainerName: tcp-eof
-              Condition: START
           PortMappings:
             - ContainerPort: 6667
               Protocol: tcp
@@ -130,6 +111,25 @@ Resources:
               awslogs-group: !Ref LogGroup
               awslogs-region: !Ref AWS::Region
               awslogs-stream-prefix: ngircd
+        
+        # tcp-eof sidecar for health checks
+        - Name: tcp-eof
+          Image: ghcr.io/nanonyme/tcp-eof:latest
+          Essential: true
+          DependsOn:
+            - ContainerName: ngircd
+              Condition: START
+          Command:
+            - '9999'
+          PortMappings:
+            - ContainerPort: 9999
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref LogGroup
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: tcp-eof
 
   # Security Group for ECS Tasks
   ECSSecurityGroup:
@@ -257,7 +257,7 @@ Outputs:
 
 ### Key Features of the Example
 
-1. **Essential Sidecar Pattern**: Both the tcp-eof and ngIRCd containers are marked as `Essential: true`, ensuring that if either container terminates, ECS will spawn a new task. ngIRCd depends on tcp-eof starting to ensure health checks are available before the IRC server starts.
+1. **Essential Sidecar Pattern**: Both the tcp-eof and ngIRCd containers are marked as `Essential: true`, ensuring that if either container terminates, ECS will spawn a new task. tcp-eof depends on ngIRCd starting to ensure the IRC server is fully up before the health check begins accepting connections.
 
 2. **TLS Termination**: The NLB listener on port 6697 terminates TLS and forwards plain IRC traffic to ngIRCd on port 6667, allowing ngIRCd to serve both encrypted and unencrypted connections without needing TLS configuration.
 
