@@ -24,8 +24,6 @@ func main() {
 	}
 	defer listener.Close()
 
-	log.Printf("Listening on port %s", port)
-
 	// Accept connections and close them immediately
 	for {
 		conn, err := listener.Accept()
@@ -35,6 +33,8 @@ func main() {
 		}
 
 		// Close the connection immediately
-		conn.Close()
+		if err := conn.Close(); err != nil {
+			log.Printf("Failed to close connection: %v", err)
+		}
 	}
 }
