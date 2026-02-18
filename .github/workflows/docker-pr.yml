@@ -2,6 +2,9 @@ name: Build Docker Image (PR)
 
 on:
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'LICENSE'
 
 jobs:
   build:
