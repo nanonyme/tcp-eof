@@ -1,5 +1,5 @@
 # First stage: Build the Go program
-FROM debian:bookworm-slim AS builder
+FROM debian:trixie-slim AS builder
 
 # Install Go
 RUN apt-get update && \
