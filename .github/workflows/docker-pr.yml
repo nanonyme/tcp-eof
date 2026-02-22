@@ -35,7 +35,6 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=ref,event=pr
-            type=sha
 
       - name: Build Docker image
         id: build
