@@ -33,3 +33,7 @@ go.work.sum
 
 # Build output
 tcp-eof
+
+# Python
+__pycache__/
+*.pyc
