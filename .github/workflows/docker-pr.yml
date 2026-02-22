@@ -52,29 +52,7 @@ jobs:
         run: docker run -d -p ${{ env.TEST_PORT }}:${{ env.TEST_PORT }} --name tcp-eof-test ${{ steps.build.outputs.imageid }}
 
       - name: Test TCP EOF behavior
-        run: |
-          python3 -c "
-          import socket, sys, time
-          port = int('${{ env.TEST_PORT }}')
-          for attempt in range(10):
-              try:
-                  s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                  s.settimeout(5)
-                  s.connect(('127.0.0.1', port))
-                  data = s.recv(1024)
-                  if data == b'':
-                      print('OK: Connection accepted and closed with EOF')
-                      sys.exit(0)
-                  else:
-                      print('FAIL: Got unexpected data:', repr(data))
-                      sys.exit(1)
-              except ConnectionRefusedError:
-                  if attempt < 9:
-                      time.sleep(1)
-                  else:
-                      print('FAIL: Container did not become ready in time')
-                      sys.exit(1)
-          "
+        run: python3 tests/test_tcp_eof.py ${{ env.TEST_PORT }}
 
       - name: Stop container
         if: always()
